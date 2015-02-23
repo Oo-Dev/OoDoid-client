@@ -19,6 +19,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -68,7 +70,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
         mConnectButton = (Button)findViewById(R.id.bt_connect);
         mWaitBar = (ProgressBar)findViewById(R.id.pb_wait);
+        mStatus = (TextView)findViewById(R.id.tv_status);
         
+        mSettings = this.getPreferences(MODE_PRIVATE);
+        editor = mSettings.edit();
+                
         mConnectButton.setOnClickListener(this);
         mHandler = new Handler(){
             @Override
@@ -79,17 +85,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     case MSG_STORING:mStatus.setText(R.string.status_cache);break;
                     case MSG_DONE:mStatus.setText(R.string.status_done);break;
                     case MSG_CONNECT_ERROR:logError(getApplicationContext().getResources().getText(R.string.error_connect).toString());
-                        mConnectButton.setClickable(true);break;
+                        initUI();break;
                     case MSG_STORE_ERROR:logError(getApplicationContext().getResources().getText(R.string.error_cache).toString());
-                        mConnectButton.setClickable(true);break;
+                        initUI();break;
                     case MSG_DOWNLOAD_ERROR:logError(getApplicationContext().getResources().getText(R.string.error_download).toString());
-                        mConnectButton.setClickable(true);break;
+                        initUI();break;
                     default:break;
                 }
                     
             }
         };
-        editor = mSettings.edit();
+       // editor = mSettings.edit();
+    }
+    
+    private void initUI(){
+        mConnectButton.setClickable(true);
+        mWaitBar.setVisibility(View.INVISIBLE);
+        mStatus.setText(R.string.demo);
     }
 
 
@@ -161,6 +173,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             } catch (IOException e) {
                 updateUI(MSG_CONNECT_ERROR);
                 e.printStackTrace();
+                return ;
             }
             Log.i(TAG, "connect success");
             
@@ -172,6 +185,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             } catch (IOException e) {
                 updateUI(MSG_DOWNLOAD_ERROR);
                 e.printStackTrace();
+                return ;
             }
             
             Log.d(TAG,"Storing sdp file");
@@ -186,6 +200,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }  catch (IOException e) {
                 e.printStackTrace();
                 updateUI(MSG_STORE_ERROR);
+                return ;
             }
 
 
@@ -200,7 +215,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             msg = mHandler.obtainMessage();
             msg.arg1 = arg;
             mHandler.sendMessage(msg);
-            msg.recycle();
+            //msg.recycle();
         }
         
         private void createFile(){
