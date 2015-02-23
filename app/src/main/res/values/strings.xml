@@ -1,6 +1,14 @@
 <resources>
     <string name="app_name">OoDroid-client</string>
-
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="connect">Connect</string>
+    <string name="demo">Demo</string>
+    <string name="status_connect">Connecting ...</string>
+    <string name="status_cache">Caching ...</string>
+    <string name="status_done">Done!</string>
+    <string name="error_connect">Connection Error</string>
+    <string name="error_cache">Cache Error</string>
+    <string name="error_download">Connection Error</string>
+    <string name="guide">Please pick VLC up after download.</string>
 </resources>
+    
