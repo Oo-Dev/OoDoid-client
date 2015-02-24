@@ -5,6 +5,7 @@
     <string name="demo">Demo</string>
     <string name="status_connect">Connecting ...</string>
     <string name="status_cache">Caching ...</string>
+    <string name="status_request">Sending request ...</string>
     <string name="status_done">Done!</string>
     <string name="error_connect">Connection Error</string>
     <string name="error_cache">Cache Error</string>

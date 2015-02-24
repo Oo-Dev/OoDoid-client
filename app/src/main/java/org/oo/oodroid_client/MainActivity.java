@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.CharBuffer;
 
@@ -35,18 +36,21 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private final static String TAG = "MainActivity";
     private final static String KEY_SERVER_HOST = "server_host";
     private final static String KEY_SERVER_PORT = "server_port";
+
+    public final static String REQUEST_SDP = "REQUEST SDP FILE";
     
     private final static String SDP_FILE_PATH = "session.sdp";
 
     /** Constants below are used to update UI with handler*/
     private final static int MSG_CONNECTING = 0;
     private final static int MSG_STORING = 1;
-    private final static int MSG_DONE = 2;
+    private final static int MSG_SENDING_REQUEST = 2;
+    private final static int MSG_DONE = 3;
     
-    private final static int MSG_ERROR = 3;
-    private final static int MSG_CONNECT_ERROR = 4;
-    private final static int MSG_STORE_ERROR = 5;
-    private final static int MSG_DOWNLOAD_ERROR = 6;
+    private final static int MSG_ERROR = 4;
+    private final static int MSG_CONNECT_ERROR = 5;
+    private final static int MSG_STORE_ERROR = 6;
+    private final static int MSG_DOWNLOAD_ERROR = 7;
 
     
     
@@ -84,6 +88,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     case MSG_CONNECTING:mStatus.setText(R.string.status_connect);break;
                     case MSG_STORING:mStatus.setText(R.string.status_cache);break;
                     case MSG_DONE:mStatus.setText(R.string.status_done);break;
+                    case MSG_SENDING_REQUEST:mStatus.setText(R.string.status_request);break;
                     case MSG_CONNECT_ERROR:logError(getApplicationContext().getResources().getText(R.string.error_connect).toString());
                         initUI();break;
                     case MSG_STORE_ERROR:logError(getApplicationContext().getResources().getText(R.string.error_cache).toString());
@@ -95,7 +100,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     
             }
         };
-       // editor = mSettings.edit();
     }
     
     private void initUI(){
@@ -170,6 +174,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
             updateUI(MSG_CONNECTING);
             try {
                 mSocket = new Socket(host,port);
+                Log.d(TAG,"Sending request");
+                updateUI(MSG_SENDING_REQUEST);
+                new PrintWriter(mSocket.getOutputStream()).print(REQUEST_SDP);
             } catch (IOException e) {
                 updateUI(MSG_CONNECT_ERROR);
                 e.printStackTrace();
@@ -177,6 +184,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
             Log.i(TAG, "connect success");
             
+           
             updateUI(MSG_STORING);
             Log.d(TAG,"Downloading sdp file");
             try {
@@ -192,21 +200,38 @@ public class MainActivity extends Activity implements View.OnClickListener {
             try {
                 File file = new File(SDP_FILE_PATH);
                 if(!file.exists()){
-                    createFile();
+                    writer = createFile();
                 }
                 else {
                     writer = new OutputStreamWriter(getApplicationContext().openFileOutput(SDP_FILE_PATH, MODE_WORLD_READABLE));//TODO is this okay?
+                    
                 }
             }  catch (IOException e) {
                 e.printStackTrace();
                 updateUI(MSG_STORE_ERROR);
                 return ;
             }
+            try {
+                writer.write(mSessionDescription.toString());
+                writer.flush();
+                //writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                updateUI(MSG_STORE_ERROR);
+                return ;
+            }
+
+            try {
+                mSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                updateUI(MSG_CONNECT_ERROR);
+            }
 
 
             updateUI(MSG_DONE);
             Log.i(TAG, "store sdp file success");
-
+            
             Log.d(TAG, "Opening sdp file");
             startActivity(getVideoFileIntent(new File(SDP_FILE_PATH)));
         }
@@ -218,10 +243,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
             //msg.recycle();
         }
         
-        private void createFile(){
+        private OutputStreamWriter createFile(){
             //TODO create session.sdp
             
-            
+            return null;
         }
 
         private Intent getVideoFileIntent(File file)
