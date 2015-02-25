@@ -24,6 +24,7 @@ import org.w3c.dom.Text;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -55,7 +56,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     
     
-    private final static String DEFAULT_HOST = "192.168.0.105";
+    private final static String DEFAULT_HOST = "192.168.0.100";
     private final static int DEFAULT_PORT = 25581;
     
     private int port = DEFAULT_PORT;
@@ -163,8 +164,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         String host;
         int port;
         Message msg;
-        String mSessionDescription ;
-        OutputStreamWriter fileWriter;
+        String mSessionDescription = null;
+        FileOutputStream fileWriter;
         
         WorkerThread(String host,int port){
             this.host = host;
@@ -197,11 +198,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
             Log.d(TAG,"Downloading sdp file");
             try {
                 BufferedReader bf =  new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
-                String line = null;
+                String line ;
                 while((line = bf.readLine()) != null){
-                    mSessionDescription += line + "\n";
+                    line += '\n';
+                    if(mSessionDescription != null)
+                        mSessionDescription += line;
+                    else
+                        mSessionDescription = line;
                 }
                 Log.d(TAG,"Got session description \n" + mSessionDescription);
+                //TODO Handle error request
             } catch (IOException e) {
                 updateUI(MSG_DOWNLOAD_ERROR);
                 e.printStackTrace();
@@ -210,12 +216,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
             
             Log.d(TAG,"Storing sdp file");
             try {
+                //TODO create file when unexisted
                 //File file = new File(SDP_FILE_PATH);
                 //if(!file.exists()){
                  //   fileWriter = createFile();
                // }
                 //else {
-                    fileWriter = new OutputStreamWriter(getApplicationContext().openFileOutput(SDP_FILE_PATH, MODE_WORLD_READABLE));//TODO is this okay?
+                    fileWriter = getApplicationContext().openFileOutput(SDP_FILE_PATH, MODE_WORLD_READABLE);
                     
                 //}
             }  catch (IOException e) {
@@ -224,15 +231,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 return ;
             }
             try {
-                fileWriter.write(mSessionDescription.toString());
+                fileWriter.write(mSessionDescription.getBytes());
                 fileWriter.flush();
-                //writer.close();
+                fileWriter.close();
             } catch (IOException e) {
-                e.printStackTrace();
                 updateUI(MSG_STORE_ERROR);
-                return ;
+                e.printStackTrace();
             }
-
+ 
             try {
                 mSocket.close();
             } catch (IOException e) {
