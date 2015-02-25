@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -54,8 +55,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     
     
-    private final static String DEFAULT_HOST = "192.168.0.101";
-    private final static int DEFAULT_PORT = 25580;
+    private final static String DEFAULT_HOST = "192.168.0.105";
+    private final static int DEFAULT_PORT = 25581;
     
     private int port = DEFAULT_PORT;
     private String host = DEFAULT_HOST;
@@ -87,14 +88,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 switch (msg.arg1){
                     case MSG_CONNECTING:mStatus.setText(R.string.status_connect);break;
                     case MSG_STORING:mStatus.setText(R.string.status_cache);break;
-                    case MSG_DONE:mStatus.setText(R.string.status_done);break;
+                    case MSG_DONE:mStatus.setText(R.string.status_done);initUI(true);break;
                     case MSG_SENDING_REQUEST:mStatus.setText(R.string.status_request);break;
                     case MSG_CONNECT_ERROR:logError(getApplicationContext().getResources().getText(R.string.error_connect).toString());
-                        initUI();break;
+                        initUI(false);break;
                     case MSG_STORE_ERROR:logError(getApplicationContext().getResources().getText(R.string.error_cache).toString());
-                        initUI();break;
+                        initUI(false);break;
                     case MSG_DOWNLOAD_ERROR:logError(getApplicationContext().getResources().getText(R.string.error_download).toString());
-                        initUI();break;
+                        initUI(false);break;
                     default:break;
                 }
                     
@@ -102,10 +103,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
         };
     }
     
-    private void initUI(){
+    private void initUI(boolean isDone){
         mConnectButton.setClickable(true);
         mWaitBar.setVisibility(View.INVISIBLE);
-        mStatus.setText(R.string.demo);
+        if(!isDone)
+            mStatus.setText(R.string.demo);
+        else
+            mStatus.setText(R.string.status_done);
     }
 
 
@@ -159,8 +163,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         String host;
         int port;
         Message msg;
-        CharBuffer mSessionDescription;
-        OutputStreamWriter writer;
+        String mSessionDescription ;
+        OutputStreamWriter fileWriter;
         
         WorkerThread(String host,int port){
             this.host = host;
@@ -173,12 +177,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
             Log.d(TAG, "Start to connect");
             updateUI(MSG_CONNECTING);
             try {
-                mSocket = new Socket(host,port);
-                Log.d(TAG,"Sending request");
+                Log.d(TAG,"Sending request to " + host + ":" + port);
+                mSocket = new Socket(host, port);
+                Log.d(TAG,"Connect OK");
                 updateUI(MSG_SENDING_REQUEST);
-                new PrintWriter(mSocket.getOutputStream()).print(REQUEST_SDP);
+                PrintWriter pw = new PrintWriter(mSocket.getOutputStream());
+                pw.print(REQUEST_SDP);
+                pw.flush();
             } catch (IOException e) {
                 updateUI(MSG_CONNECT_ERROR);
+                Log.e(TAG,"connect error");
                 e.printStackTrace();
                 return ;
             }
@@ -188,8 +196,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
             updateUI(MSG_STORING);
             Log.d(TAG,"Downloading sdp file");
             try {
-                int length = new InputStreamReader(mSocket.getInputStream()).read(mSessionDescription);
-                Log.d(TAG,"Got session description \n" + mSessionDescription.toString());
+                BufferedReader bf =  new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
+                String line = null;
+                while((line = bf.readLine()) != null){
+                    mSessionDescription += line + "\n";
+                }
+                Log.d(TAG,"Got session description \n" + mSessionDescription);
             } catch (IOException e) {
                 updateUI(MSG_DOWNLOAD_ERROR);
                 e.printStackTrace();
@@ -198,22 +210,22 @@ public class MainActivity extends Activity implements View.OnClickListener {
             
             Log.d(TAG,"Storing sdp file");
             try {
-                File file = new File(SDP_FILE_PATH);
-                if(!file.exists()){
-                    writer = createFile();
-                }
-                else {
-                    writer = new OutputStreamWriter(getApplicationContext().openFileOutput(SDP_FILE_PATH, MODE_WORLD_READABLE));//TODO is this okay?
+                //File file = new File(SDP_FILE_PATH);
+                //if(!file.exists()){
+                 //   fileWriter = createFile();
+               // }
+                //else {
+                    fileWriter = new OutputStreamWriter(getApplicationContext().openFileOutput(SDP_FILE_PATH, MODE_WORLD_READABLE));//TODO is this okay?
                     
-                }
+                //}
             }  catch (IOException e) {
                 e.printStackTrace();
                 updateUI(MSG_STORE_ERROR);
                 return ;
             }
             try {
-                writer.write(mSessionDescription.toString());
-                writer.flush();
+                fileWriter.write(mSessionDescription.toString());
+                fileWriter.flush();
                 //writer.close();
             } catch (IOException e) {
                 e.printStackTrace();
