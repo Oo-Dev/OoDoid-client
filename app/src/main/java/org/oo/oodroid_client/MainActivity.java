@@ -22,10 +22,14 @@ import android.widget.TextView;
 import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -183,7 +187,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 Log.d(TAG,"Connect OK");
                 updateUI(MSG_SENDING_REQUEST);
                 PrintWriter pw = new PrintWriter(mSocket.getOutputStream());
-                pw.print(REQUEST_SDP);
+                pw.println(REQUEST_SDP);
                 pw.flush();
             } catch (IOException e) {
                 updateUI(MSG_CONNECT_ERROR);
@@ -231,9 +235,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 return ;
             }
             try {
-                fileWriter.write(mSessionDescription.getBytes());
+                if(mSessionDescription != null)
+                    fileWriter.write(mSessionDescription.getBytes());
                 fileWriter.flush();
                 fileWriter.close();
+                
+                //debug
+                InputStream is = getApplicationContext().openFileInput(SDP_FILE_PATH);
+                ByteArrayOutputStream ba = new ByteArrayOutputStream();
+                byte[] buff = new byte[1024];
+                int length = 0;
+                while((length = is.read(buff)) != -1){
+                    ba.write(buff);
+                }
+                Log.d(TAG,"string in file is : " + buff.toString());
+                //br.close();
+                is.close();
+                
             } catch (IOException e) {
                 updateUI(MSG_STORE_ERROR);
                 e.printStackTrace();
