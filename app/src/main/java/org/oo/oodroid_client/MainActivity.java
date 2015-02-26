@@ -240,16 +240,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 fileWriter.flush();
                 fileWriter.close();
                 
-                //debug
+                //debug output content of file
                 InputStream is = getApplicationContext().openFileInput(SDP_FILE_PATH);
                 ByteArrayOutputStream ba = new ByteArrayOutputStream();
                 byte[] buff = new byte[1024];
                 int length = 0;
                 while((length = is.read(buff)) != -1){
-                    ba.write(buff);
+                    ba.write(buff,0,length);
                 }
-                Log.d(TAG,"string in file is : " + buff.toString());
-                //br.close();
+                Log.d(TAG,"string in file is :\n" + ba.toString());//only correct after trim
+                ba.close();
                 is.close();
                 
             } catch (IOException e) {
