@@ -221,7 +221,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             Log.d(TAG,"Storing sdp file");
             try {
                 //TODO create file when unexisted
-                //File file = new File(SDP_FILE_PATH);
+               // File file = new File(SDP_FILE_PATH);
+                //Log.d(TAG,"session.sdp is in " + file.getAbsolutePath());
                 //if(!file.exists()){
                  //   fileWriter = createFile();
                // }
@@ -248,7 +249,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 while((length = is.read(buff)) != -1){
                     ba.write(buff,0,length);
                 }
-                Log.d(TAG,"string in file is :\n" + ba.toString());//only correct after trim
+                Log.d(TAG,"string in file is :\n" + ba.toString());
                 ba.close();
                 is.close();
                 
@@ -268,8 +269,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             updateUI(MSG_DONE);
             Log.i(TAG, "store sdp file success");
             
-            Log.d(TAG, "Opening sdp file");
-            startActivity(getVideoFileIntent(new File(SDP_FILE_PATH)));
+            Log.d(TAG, "Opening sdp file from " + getApplicationContext().getFilesDir());
+            startActivity(getVideoFileIntent(new File(getApplicationContext().getFilesDir() + "/" + SDP_FILE_PATH)));
         }
         
         private void updateUI(int arg){
