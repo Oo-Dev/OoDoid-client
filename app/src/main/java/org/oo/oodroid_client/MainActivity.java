@@ -60,7 +60,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     
     
-    private final static String DEFAULT_HOST = "192.168.0.100";
+    //
+    
+    private final static String DEFAULT_HOST = "192.168.43.1";
     private final static int DEFAULT_PORT = 25581;
     
     private int port = DEFAULT_PORT;
