@@ -7,7 +7,7 @@ import android.os.Handler;
 
 public class LaunchActivity extends Activity{
 
-    private final static int LAUNCH_ACTIVITY_DELAY = 3000;
+    private final static int LAUNCH_ACTIVITY_DELAY = 1500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

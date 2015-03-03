@@ -44,7 +44,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private final static String KEY_SERVER_PORT = "server_port";
 
     public final static String REQUEST_SDP = "REQUEST SDP FILE";
-    
+
     private final static String SDP_FILE_PATH = "session.sdp";
 
     /** Constants below are used to update UI with handler*/
