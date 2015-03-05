@@ -34,6 +34,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.nio.CharBuffer;
 
 
@@ -223,12 +224,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
             Log.d(TAG,"Storing sdp file");
             try {
                 //TODO create file when unexisted
-               // File file = new File(SDP_FILE_PATH);
-                //Log.d(TAG,"session.sdp is in " + file.getAbsolutePath());
-                //if(!file.exists()){
-                 //   fileWriter = createFile();
-               // }
-                //else {
                     fileWriter = getApplicationContext().openFileOutput(SDP_FILE_PATH, MODE_WORLD_READABLE);
                     
                 //}
@@ -280,12 +275,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
             msg.arg1 = arg;
             mHandler.sendMessage(msg);
             //msg.recycle();
-        }
-        
-        private OutputStreamWriter createFile(){
-            //TODO create session.sdp
-            
-            return null;
         }
 
         private Intent getVideoFileIntent(File file)
