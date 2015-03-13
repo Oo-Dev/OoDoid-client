@@ -63,7 +63,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     
     //
     
-    private final static String DEFAULT_HOST = "192.168.43.1";
+    private final static String DEFAULT_HOST = "192.168.1.109";
     private final static int DEFAULT_PORT = 25581;
     
     private int port = DEFAULT_PORT;
@@ -267,7 +267,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
             Log.i(TAG, "store sdp file success");
             
             Log.d(TAG, "Opening sdp file from " + getApplicationContext().getFilesDir());
-            startActivity(getVideoFileIntent(new File(getApplicationContext().getFilesDir() + "/" + SDP_FILE_PATH)));
+            Intent in =new Intent(MainActivity.this,OoMediaPlayer.class);
+            startActivity(in);
+            //startActivity(getVideoFileIntent(new File(getApplicationContext().getFilesDir() + "/" + SDP_FILE_PATH)));
         }
         
         private void updateUI(int arg){
@@ -287,5 +289,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
             intent.setDataAndType(uri, "video/*");
             return intent;
         }
+
     }
 }
