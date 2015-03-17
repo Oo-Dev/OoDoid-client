@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/AppTheme">
+    >
     <io.vov.vitamio.widget.CenterLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

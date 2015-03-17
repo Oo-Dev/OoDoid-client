@@ -6,14 +6,14 @@
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
     android:theme="@style/AppTheme">
 
-    <TextView android:text="@string/demo" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" 
-        android:id="@+id/tv_status"
-        android:layout_below="@+id/pb_wait"
+    <TextView android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textSize="20dp"
         android:layout_centerHorizontal="true"
-        android:textSize="20dp"/>
+        android:layout_below="@+id/pb_wait"
+        android:id="@+id/tv_status"
+        android:text="@string/demo"/>
 
-    
     <Button android:text="@string/connect" android:layout_height="wrap_content"
         android:layout_width="wrap_content" android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" android:id="@+id/bt_connect"/>
@@ -27,9 +27,11 @@
         android:visibility="invisible"
         android:indeterminate="false" />
 
-    <TextView
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/edit"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/guide"
-        android:layout_alignParentRight="true"/>
+        android:hint="Please enter the target IP address"
+        android:layout_above="@+id/pb_wait"
+        />
 </RelativeLayout>

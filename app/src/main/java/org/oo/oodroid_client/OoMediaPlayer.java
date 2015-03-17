@@ -2,6 +2,7 @@ package org.oo.oodroid_client;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -9,6 +10,9 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Toast;
 
 import io.vov.vitamio.LibsChecker;
 import io.vov.vitamio.MediaPlayer;
@@ -22,7 +26,7 @@ public class OoMediaPlayer extends Activity implements OnBufferingUpdateListener
     private String path;
     private SurfaceView mPreView;
     private SurfaceHolder holder;
-    //private Bundle extras;
+    private Bundle extras;
     private int mVideoWidth;
     private int mVideoHeight;
     private boolean mIsVideoSizeKnown = false;
@@ -33,20 +37,24 @@ public class OoMediaPlayer extends Activity implements OnBufferingUpdateListener
         super.onCreate(icicle);
         if(!LibsChecker.checkVitamioLibs(this))
             return;
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.mediaplayer);
         mPreView = (SurfaceView) findViewById(R.id.surface);
         holder = mPreView.getHolder();
         holder.addCallback(this);
         holder.setFormat(PixelFormat.RGBA_8888);
-        //extras = getIntent().getExtras();
+        extras = getIntent().getExtras();
     }
 
     private void playVideo(){
         doCleanUp();
         try {
-            path=getApplicationContext().getFilesDir() + "/" + SDP_FILE_PATH;
+            path=extras.getString("URL");
+            Log.v(TAG,"path is "+path);
             mMediaPlayer = new MediaPlayer(this);
             mMediaPlayer.setDataSource(path);
+            Log.v(TAG,"Open success");
             mMediaPlayer.setDisplay(holder);
             mMediaPlayer.prepareAsync();
             mMediaPlayer.setOnBufferingUpdateListener(this);
@@ -56,11 +64,14 @@ public class OoMediaPlayer extends Activity implements OnBufferingUpdateListener
             setVolumeControlStream(AudioManager.STREAM_MUSIC);
         }catch (Exception e){
             Log.e(TAG,"Error: "+e.getMessage(),e);
+            Toast.makeText(getApplicationContext(), "connect failed",Toast.LENGTH_SHORT).show();
+            Intent in =new Intent(OoMediaPlayer.this,MainActivity.class);
+            startActivity(in);
         }
     }
 
     public void onBufferingUpdate(MediaPlayer arg0,int percent){
-        Log.d(TAG,"Buffering:"+percent);
+        //Log.d(TAG,"Buffering:"+percent);
     }
 
     public void onCompletion(MediaPlayer arg0) {

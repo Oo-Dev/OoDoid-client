@@ -3,13 +3,14 @@
     <string name="action_settings">设置</string>
     <string name="app_name">OoDroid客户端</string>
     <string name="connect">连接</string>
-    <string name="demo">演示</string>
     <string name="status_cache">正在缓冲...</string>
     <string name="status_connect">正在连接...</string>
+    <string name="status_request">发送请求</string>
     <string name="status_done">完成！</string>
     <string name="error_cache">缓冲失败</string>
     <string name="error_connect">连接失败</string>
     <string name="error_download">连接失败</string>
-    <string name="guide">请在下载成功后选择VLC</string>
+    <string name="edit">请输入目标IP地址</string>
+    <string name="demo">演示</string>
 
 </resources>

@@ -44,9 +44,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private final static String KEY_SERVER_HOST = "server_host";
     private final static String KEY_SERVER_PORT = "server_port";
 
-    public final static String REQUEST_SDP = "REQUEST SDP FILE";
+    //public final static String REQUEST_SDP = "REQUEST SDP FILE";
 
-    private final static String SDP_FILE_PATH = "session.sdp";
+    //private final static String SDP_FILE_PATH = "session.sdp";
 
     /** Constants below are used to update UI with handler*/
     private final static int MSG_CONNECTING = 0;
@@ -63,7 +63,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     
     //
     
-    private final static String DEFAULT_HOST = "192.168.1.109";
+    private final static String DEFAULT_HOST = "192.168.1.111";
     private final static int DEFAULT_PORT = 25581;
     
     private int port = DEFAULT_PORT;
@@ -72,7 +72,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private Button mConnectButton;
     private ProgressBar mWaitBar;
     private TextView mStatus;
-    //private EditText
+    private EditText mHost;
     private SharedPreferences mSettings;
     private SharedPreferences.Editor editor;
     Handler mHandler;
@@ -84,7 +84,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mConnectButton = (Button)findViewById(R.id.bt_connect);
         mWaitBar = (ProgressBar)findViewById(R.id.pb_wait);
         mStatus = (TextView)findViewById(R.id.tv_status);
-        
+        mHost = (EditText)findViewById(R.id.edit);
         mSettings = this.getPreferences(MODE_PRIVATE);
         editor = mSettings.edit();
                 
@@ -157,15 +157,48 @@ public class MainActivity extends Activity implements View.OnClickListener {
     
     @Override
     public void onClick(View v) {
-        mConnectButton.setClickable(false);
+        //mConnectButton.setClickable(false);
         mWaitBar.setVisibility(View.VISIBLE);
+        host = mHost.getText().toString();
+        if(host=="")
+            host = DEFAULT_HOST;
         new WorkerThread(host,port).start();
 
     }
     
-    
-    
     class WorkerThread extends Thread{
+
+        String host;
+        int port;
+        Message msg;
+
+        WorkerThread(String host,int port){
+            this.host=host;
+            this.port=port;
+        }
+
+        @Override
+        public void run(){
+            updateUI(MSG_CONNECTING);
+            Intent in=new Intent(MainActivity.this,OoMediaPlayer.class);
+            Bundle bd =new Bundle();
+            bd.putString("URL","rtsp://"+host+":"+port+"/");
+            Log.v(TAG,"link to "+"rtsp://"+host+":"+port+"/");
+            in.putExtras(bd);
+            startActivity(in);
+            updateUI(MSG_DONE);
+        }
+
+        private void updateUI(int arg){
+            msg = mHandler.obtainMessage();
+            msg.arg1 = arg;
+            mHandler.sendMessage(msg);
+            //msg.recycle();
+        }
+
+    }
+    
+    /*class WorkerThread extends Thread{
 
         Socket mSocket;
         String host;
@@ -290,5 +323,5 @@ public class MainActivity extends Activity implements View.OnClickListener {
             return intent;
         }
 
-    }
+    }*/
 }
